@@ -1,0 +1,3 @@
+[submodule "blindSQLi"]
+	path = blindSQLi
+	url = https://github.com/21y4d/blindSQLi.git
