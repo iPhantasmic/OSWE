@@ -1,3 +1,9 @@
 [submodule "blindSQLi"]
 	path = blindSQLi
 	url = https://github.com/21y4d/blindSQLi.git
+[submodule "AWAE-PREP"]
+	path = AWAE-PREP
+	url = https://github.com/Vanshal/AWAE-PREP.git
+[submodule "exploit-writing-for-oswe"]
+	path = exploit-writing-for-oswe
+	url = https://github.com/rizemon/exploit-writing-for-oswe.git
