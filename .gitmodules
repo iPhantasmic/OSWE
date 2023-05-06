@@ -7,3 +7,6 @@
 [submodule "exploit-writing-for-oswe"]
 	path = exploit-writing-for-oswe
 	url = https://github.com/rizemon/exploit-writing-for-oswe.git
+[submodule "OSWE-Labs-Poc"]
+	path = OSWE-Labs-Poc
+	url = https://github.com/svdwi/OSWE-Labs-Poc.git
