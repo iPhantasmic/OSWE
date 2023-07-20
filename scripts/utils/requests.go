@@ -12,6 +12,7 @@ import (
 
 type Response struct {
 	StatusCode      int
+	ContentLength   int64
 	ResponseBody    string
 	ResponseHeaders map[string]string
 }
@@ -52,6 +53,9 @@ func SendGetRequest(client *http.Client, debug bool, requestURL string) Response
 		// print HTTP status code
 		PrintInfo(fmt.Sprintf("HTTP response status code: %d", resp.StatusCode))
 
+		// print HTTP content length
+		PrintInfo(fmt.Sprintf("HTTP response content length: %d", resp.ContentLength))
+
 		// print HTTP response body
 		PrintInfo("Response body: ")
 		fmt.Println(bodyString)
@@ -61,11 +65,13 @@ func SendGetRequest(client *http.Client, debug bool, requestURL string) Response
 		for header, value := range respHeaders {
 			fmt.Printf("\t%s = %s\n", header, value)
 		}
+
+		fmt.Println("")
 	}
 
-	fmt.Println("")
 	return Response{
 		StatusCode:      resp.StatusCode,
+		ContentLength:   resp.ContentLength,
 		ResponseBody:    bodyString,
 		ResponseHeaders: respHeaders,
 	}
