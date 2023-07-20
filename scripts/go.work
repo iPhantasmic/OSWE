@@ -1,3 +1,7 @@
 go 1.19
 
-use ./templates
+use (
+	./atutor
+	./templates
+	./utils
+)
