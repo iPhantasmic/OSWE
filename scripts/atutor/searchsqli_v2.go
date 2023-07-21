@@ -41,7 +41,7 @@ func main() {
 	args := os.Args[:]
 	log.Println("Args: ", args)
 
-	if len(args) < 3 {
+	if len(args) < 2 {
 		utils.PrintFailure(fmt.Sprintf("usage: %s [-proxy=<proxyIP>] [-debug=true] <target>", os.Args[0]))
 		utils.PrintFailure(fmt.Sprintf("eg: %s 192.168.121.103", os.Args[0]))
 		os.Exit(1)
