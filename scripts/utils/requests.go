@@ -11,6 +11,13 @@ import (
 
 // Helper functions and wrappers for making requests
 
+type PostRequest struct {
+	ContentType string
+	Cookies     []*http.Cookie
+	FormData    url.Values
+	JsonData    string
+}
+
 type Response struct {
 	StatusCode      int
 	ContentLength   int64
@@ -78,13 +85,38 @@ func SendGetRequest(client *http.Client, debug bool, requestURL string) Response
 	}
 }
 
-func SendPostRequestForm(client *http.Client, debug bool, requestURL string, data url.Values) Response {
+func SendPostRequest(client *http.Client, debug bool, requestURL string, postRequest PostRequest) Response {
 	// create our HTTP POST request
-	req, err := http.NewRequest(http.MethodPost, requestURL, strings.NewReader(data.Encode()))
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	// we are not using client.PostForm() so we have to specify the Content-Type
-	if err != nil {
-		log.Fatalln("[-] Failed to create HTTP request: ", err)
+	var req *http.Request
+	var err error
+
+	// form POST request
+	if postRequest.ContentType == "form" {
+		req, err = http.NewRequest(http.MethodPost, requestURL, strings.NewReader(postRequest.FormData.Encode()))
+		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+		// we are not using client.PostForm() so we have to specify the Content-Type
+		if err != nil {
+			log.Fatalln("[-] Failed to create HTTP request: ", err)
+		}
+	}
+	// json POST request
+	if postRequest.ContentType == "json" {
+		// TODO: properly deal with the json body
+		//req, err = http.NewRequest(http.MethodPost, requestURL, strings.NewReader(postRequest.FormData.Encode()))
+		//req.Header.Add("Content-Type", "application/json")
+		//if err != nil {
+		//	log.Fatalln("[-] Failed to create HTTP request: ", err)
+		//}
+	} else {
+		//req, err = http.NewRequest(http.MethodPost, requestURL, TBD)
+		//if err != nil {
+		//	log.Fatalln("[-] Failed to create HTTP request: ", err)
+		//}
+	}
+
+	// add cookies to the created request
+	for _, cookie := range postRequest.Cookies {
+		req.AddCookie(cookie)
 	}
 
 	if debug {

@@ -50,7 +50,12 @@ func loginWithHash(debug bool, ip string, hash string) bool {
 	}
 
 	// send the request
-	response := utils.SendPostRequestForm(client, debug, requestURL, data)
+	response := utils.SendPostRequest(client, debug, requestURL, utils.PostRequest{
+		ContentType: "form",
+		Cookies:     []*http.Cookie{},
+		FormData:    data,
+		JsonData:    "",
+	})
 
 	// regex for evidence of successful login
 	match1, _ := regexp.MatchString("Create Course: My Start Page", response.ResponseBody)
@@ -84,12 +89,14 @@ func main() {
 		// disable TLS verification and set proxy URL
 		proxyUrl, _ := url.Parse(proxyURL)
 		tr = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           http.ProxyURL(proxyUrl),
+			TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
+			DisableCompression: true, // to ensure that we can obtain Content-Length response header
+			Proxy:              http.ProxyURL(proxyUrl),
 		}
 	} else {
 		tr = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
+			DisableCompression: true, // to ensure that we can obtain Content-Length response header
 		}
 	}
 
