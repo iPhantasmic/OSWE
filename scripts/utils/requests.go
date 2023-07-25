@@ -1,21 +1,25 @@
 package utils
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 )
 
 // Helper functions and wrappers for making requests
 
 type PostRequest struct {
-	ContentType string
-	Cookies     []*http.Cookie
-	FormData    url.Values
-	JsonData    string
+	ContentType   string
+	Cookies       []*http.Cookie
+	FormData      url.Values
+	JsonData      string
+	MultipartData map[string]string
 }
 
 type Response struct {
@@ -85,12 +89,56 @@ func SendGetRequest(client *http.Client, debug bool, requestURL string) Response
 	}
 }
 
+func CreateMultipartFormData(form map[string]string) (b bytes.Buffer, w *multipart.Writer) {
+	w = multipart.NewWriter(&b)
+
+	for key, value := range form {
+		if strings.HasPrefix(value, "@") {
+			// write file to part
+			value = value[1:]
+			file, err := os.Open(value)
+			if err != nil {
+				log.Fatalln(fmt.Sprintf("Error while opening file %s: ", value), err)
+			}
+
+			part, err := w.CreateFormFile(key, value)
+			if err != nil {
+				log.Fatalln(fmt.Sprintf("Error while creating part %s: ", key), err)
+			}
+
+			_, err = io.Copy(part, file)
+			if err != nil {
+				log.Fatalln("Error writing file to part: ", err)
+			}
+
+			file.Close()
+		} else {
+			// write string to part
+			if err := w.WriteField(key, value); err != nil {
+				log.Fatalln("Error writing string to part: ", err)
+			}
+		}
+	}
+
+	return b, w
+}
+
 func SendPostRequest(client *http.Client, debug bool, requestURL string, postRequest PostRequest) Response {
 	// create our HTTP POST request
 	var req *http.Request
+	var buffer bytes.Buffer
+	var mpWriter *multipart.Writer
 	var err error
 
 	// form POST request
+	if postRequest.ContentType == "multipart" {
+		buffer, mpWriter = CreateMultipartFormData(postRequest.MultipartData)
+		req, err = http.NewRequest(http.MethodPost, requestURL, &buffer)
+		req.Header.Add("Content-Type", mpWriter.FormDataContentType())
+		if err != nil {
+			log.Fatalln("[-] Failed to create HTTP request: ", err)
+		}
+	}
 	if postRequest.ContentType == "form" {
 		req, err = http.NewRequest(http.MethodPost, requestURL, strings.NewReader(postRequest.FormData.Encode()))
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
