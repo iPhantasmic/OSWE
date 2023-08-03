@@ -56,7 +56,7 @@ func preparePayload() string {
 
 	// 4. base64 URL-safe encoding
 	utils.PrintInfo("base64 encoding one-liner...")
-	return base64.URLEncoding.EncodeToString([]byte(fullVBS))
+	return base64.StdEncoding.EncodeToString([]byte(fullVBS))
 }
 
 func uploadVBS(debug bool, ip, payload string) bool {
