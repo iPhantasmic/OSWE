@@ -18,7 +18,7 @@ type PostRequest struct {
 	ContentType   string
 	Cookies       []*http.Cookie
 	FormData      url.Values
-	JsonData      string
+	JsonData      []byte
 	MultipartData map[string]string
 }
 
@@ -130,7 +130,7 @@ func SendPostRequest(client *http.Client, debug bool, requestURL string, postReq
 	var mpWriter *multipart.Writer
 	var err error
 
-	// form POST request
+	// multipart form POST request
 	if postRequest.ContentType == "multipart" {
 		buffer, mpWriter = CreateMultipartFormData(postRequest.MultipartData)
 		req, err = http.NewRequest(http.MethodPost, requestURL, &buffer)
@@ -139,6 +139,8 @@ func SendPostRequest(client *http.Client, debug bool, requestURL string, postReq
 			log.Fatalln("[-] Failed to create HTTP request: ", err)
 		}
 	}
+
+	// form POST request
 	if postRequest.ContentType == "form" {
 		req, err = http.NewRequest(http.MethodPost, requestURL, strings.NewReader(postRequest.FormData.Encode()))
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
@@ -147,19 +149,20 @@ func SendPostRequest(client *http.Client, debug bool, requestURL string, postReq
 			log.Fatalln("[-] Failed to create HTTP request: ", err)
 		}
 	}
+
 	// json POST request
 	if postRequest.ContentType == "json" {
-		// TODO: properly deal with the json body
-		//req, err = http.NewRequest(http.MethodPost, requestURL, strings.NewReader(postRequest.FormData.Encode()))
-		//req.Header.Add("Content-Type", "application/json")
-		//if err != nil {
-		//	log.Fatalln("[-] Failed to create HTTP request: ", err)
-		//}
+		if debug {
+			PrintInfo("JSON HTTP POST payload:")
+			fmt.Println(string(postRequest.JsonData))
+		}
+		req, err = http.NewRequest(http.MethodPost, requestURL, bytes.NewBuffer(postRequest.JsonData))
+		req.Header.Add("Content-Type", "application/json")
+		if err != nil {
+			log.Fatalln("[-] Failed to create HTTP request: ", err)
+		}
 	} else {
-		//req, err = http.NewRequest(http.MethodPost, requestURL, TBD)
-		//if err != nil {
-		//	log.Fatalln("[-] Failed to create HTTP request: ", err)
-		//}
+		log.Fatalln("[-] Failed to create HTTP request: Invalid POST request mode - " + postRequest.ContentType)
 	}
 
 	// add cookies to the created request
