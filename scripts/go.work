@@ -4,6 +4,7 @@ use (
 	./atutor/sqli
 	./atutor/tjuggle
 	./bassmaster
+	./erpnext
 	./manageengine
 	./templates
 	./utils
