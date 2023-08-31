@@ -161,7 +161,9 @@ func SendPostRequest(client *http.Client, debug bool, requestURL string, postReq
 		if err != nil {
 			log.Fatalln("[-] Failed to create HTTP request: ", err)
 		}
-	} else {
+	}
+
+	if postRequest.ContentType != "multipart" && postRequest.ContentType != "form" && postRequest.ContentType != "json " {
 		log.Fatalln("[-] Failed to create HTTP request: Invalid POST request mode - " + postRequest.ContentType)
 	}
 
