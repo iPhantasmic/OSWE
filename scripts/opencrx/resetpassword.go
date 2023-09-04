@@ -53,7 +53,7 @@ func resetPassword(debug bool, ip, username, password string) bool {
 		}
 
 		response := utils.SendPostRequest(client, debug, requestURL, request)
-		
+
 		if !strings.Contains(response.ResponseBody, "Unable to reset password") {
 			utils.PrintSuccess("Successful reset with token: " + strings.TrimSpace(token))
 			return true

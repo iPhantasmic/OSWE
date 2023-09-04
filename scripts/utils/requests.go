@@ -13,6 +13,10 @@ import (
 )
 
 // Helper functions and wrappers for making requests
+type GetRequest struct {
+	AuthUser string
+	AuthPass string
+}
 
 type PostRequest struct {
 	ContentType   string
@@ -22,6 +26,11 @@ type PostRequest struct {
 	MultipartData map[string]string
 }
 
+type DeleteRequest struct {
+	AuthUser string
+	AuthPass string
+}
+
 type Response struct {
 	StatusCode      int
 	ContentLength   int64
@@ -29,11 +38,15 @@ type Response struct {
 	ResponseHeaders map[string]string
 }
 
-func SendGetRequest(client *http.Client, debug bool, requestURL string) Response {
+func SendGetRequest(client *http.Client, debug bool, requestURL string, getRequest GetRequest) Response {
 	// create our HTTP GET request
 	req, err := http.NewRequest(http.MethodGet, requestURL, nil)
 	if err != nil {
 		log.Fatalln("[-] Failed to create HTTP request: ", err)
+	}
+
+	if getRequest.AuthUser != "" {
+		req.SetBasicAuth(getRequest.AuthUser, getRequest.AuthPass)
 	}
 
 	if debug {
@@ -174,6 +187,70 @@ func SendPostRequest(client *http.Client, debug bool, requestURL string, postReq
 
 	if debug {
 		PrintInfo("Sending HTTP POST request to: " + requestURL)
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln("[-] Failed to send HTTP request: ", err)
+	}
+	defer resp.Body.Close()
+	if debug {
+		PrintSuccess("Got HTTP response!")
+	}
+
+	// get HTTP response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln("[-] Failed to read HTTP response body: ", err)
+	}
+	bodyString := string(body)
+
+	// get HTTP response headers
+	respHeaders := make(map[string]string)
+	for headerKey, headerValues := range resp.Header {
+		respHeaders[headerKey] = strings.Join(headerValues, ", ")
+	}
+
+	if debug {
+		// print HTTP status code
+		PrintInfo(fmt.Sprintf("HTTP response status code: %d", resp.StatusCode))
+
+		// print HTTP content length
+		PrintInfo(fmt.Sprintf("HTTP response content length: %d", resp.ContentLength))
+
+		// print HTTP response body
+		PrintInfo("Response body: ")
+		fmt.Println(bodyString)
+
+		// print HTTP response headers
+		PrintInfo("Response headers: ")
+		for header, value := range respHeaders {
+			fmt.Printf("\t%s = %s\n", header, value)
+		}
+
+		fmt.Println("")
+	}
+
+	return Response{
+		StatusCode:      resp.StatusCode,
+		ContentLength:   resp.ContentLength,
+		ResponseBody:    bodyString,
+		ResponseHeaders: respHeaders,
+	}
+}
+
+func SendDeleteRequest(client *http.Client, debug bool, requestURL string, deleteRequest DeleteRequest) Response {
+	// create our HTTP DELETE request
+	req, err := http.NewRequest(http.MethodDelete, requestURL, nil)
+	if err != nil {
+		log.Fatalln("[-] Failed to create HTTP request: ", err)
+	}
+
+	if deleteRequest.AuthUser != "" {
+		req.SetBasicAuth(deleteRequest.AuthUser, deleteRequest.AuthPass)
+	}
+
+	if debug {
+		PrintInfo("Sending HTTP DELETE request to: " + requestURL)
 	}
 	resp, err := client.Do(req)
 	if err != nil {
