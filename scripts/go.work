@@ -6,6 +6,7 @@ use (
 	./bassmaster
 	./erpnext
 	./manageengine
+	./opencrx
 	./templates
 	./utils
 )
