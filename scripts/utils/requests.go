@@ -13,17 +13,22 @@ import (
 )
 
 // Helper functions and wrappers for making requests
+
 type GetRequest struct {
 	AuthUser string
 	AuthPass string
 }
 
 type PostRequest struct {
+	AuthUser      string
+	AuthPass      string
 	ContentType   string
 	Cookies       []*http.Cookie
 	FormData      url.Values
+	Headers       map[string]string
 	JsonData      []byte
 	MultipartData map[string]string
+	XmlData       []byte
 }
 
 type DeleteRequest struct {
@@ -176,8 +181,29 @@ func SendPostRequest(client *http.Client, debug bool, requestURL string, postReq
 		}
 	}
 
-	if postRequest.ContentType != "multipart" && postRequest.ContentType != "form" && postRequest.ContentType != "json " {
+	// xml POST request
+	if postRequest.ContentType == "xml" {
+		if debug {
+			PrintInfo("XML HTTP POST payload:")
+			fmt.Println(string(postRequest.XmlData))
+		}
+		req, err = http.NewRequest(http.MethodPost, requestURL, bytes.NewBuffer(postRequest.XmlData))
+		req.Header.Add("Content-Type", "application/xml")
+		if err != nil {
+			log.Fatalln("[-] Failed to create HTTP request: ", err)
+		}
+	}
+
+	if postRequest.ContentType != "multipart" && postRequest.ContentType != "form" && postRequest.ContentType != "json" && postRequest.ContentType != "xml" {
 		log.Fatalln("[-] Failed to create HTTP request: Invalid POST request mode - " + postRequest.ContentType)
+	}
+
+	if postRequest.AuthUser != "" {
+		req.SetBasicAuth(postRequest.AuthUser, postRequest.AuthPass)
+	}
+
+	for key, value := range postRequest.Headers {
+		req.Header.Add(key, value)
 	}
 
 	// add cookies to the created request
