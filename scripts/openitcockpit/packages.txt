@@ -1,0 +1,6 @@
+https://192.168.249.129/js/vendor/fineuploader
+https://192.168.249.129/js/vendor/gauge
+https://192.168.249.129/js/vendor/gridstack
+https://192.168.249.129/js/vendor/lodash
+https://192.168.249.129/js/vendor/UUID.js-4.0.3
+https://192.168.249.129/js/vendor/bootstrap-daterangepicker
