@@ -7,6 +7,7 @@ use (
 	./erpnext
 	./manageengine
 	./opencrx
+	./openitcockpit
 	./templates
 	./utils
 )
