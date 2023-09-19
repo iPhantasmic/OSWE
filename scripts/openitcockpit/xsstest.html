@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script>
+		const queryString = location.search;
+		const urlParams = new URLSearchParams(queryString);
+		const name = urlParams.get('name')
+		document.write('<h1>Hello, ' + name + '!</h1>');
+	</script>
+</head>
+</html>
