@@ -4,3 +4,4 @@
 /scripts/openitcockpit/packages/gridstack.js-0.2.3/
 /scripts/openitcockpit/packages/lodash-3.9.3/
 /scripts/openitcockpit/packages/UUID.js-4.0.3/
+*.pem
