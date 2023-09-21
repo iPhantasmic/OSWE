@@ -12,7 +12,7 @@ func CreateZipFile(fileName string) *os.File {
 	PrintInfo("Creating zip archive...")
 	archive, err := os.Create(fileName)
 	if err != nil {
-		log.Fatalln("Error while creating zip archive: ", err)
+		log.Println("Error while creating zip archive: ", err)
 	}
 
 	return archive
@@ -21,7 +21,7 @@ func CreateZipFile(fileName string) *os.File {
 func CreateFile(fileName, contents string) {
 	err := os.WriteFile(fileName, []byte(contents), 0644)
 	if err != nil {
-		log.Fatalln(fmt.Sprintf("Error while creating %s: ", fileName), err)
+		log.Println(fmt.Sprintf("Error while creating %s: ", fileName), err)
 	}
 }
 
