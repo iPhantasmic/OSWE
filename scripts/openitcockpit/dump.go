@@ -9,8 +9,6 @@ import (
 
 func saveToFile(url, content string) {
 	_, fileName := path.Split(url)
-	//fileName := strings.Replace(url, "https://", "", 1)
-	//fileName = strings.ReplaceAll(fileName, ".", "_")
 	if !strings.HasPrefix(fileName, ".html") {
 		fileName += ".html"
 	}
