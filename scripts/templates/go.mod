@@ -1,3 +1,3 @@
 module github.com/iPhantasmic/OSWE/scripts/templates
 
-go 1.19
+go 1.20

