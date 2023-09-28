@@ -1,0 +1,5 @@
+/
+/render
+/v1/render
+/api/render
+/api/v1/render
