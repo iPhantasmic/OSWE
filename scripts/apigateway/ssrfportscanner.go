@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"crypto/tls"
 	"flag"
 	"fmt"
@@ -16,6 +17,31 @@ import (
 
 var ports = []int{22, 80, 443, 1433, 1521, 3306, 3389, 5000, 5432, 5900, 6379, 8000, 8001, 8055, 8080, 8443, 9000}
 
+func portScan(client *http.Client, debug bool, target, ssrf string) {
+	for _, port := range ports {
+		jsonBody := []byte(fmt.Sprintf("{\"url\":\"%s:%d\"}", ssrf, port))
+
+		resp := utils.SendPostRequest(client, debug, target, utils.PostRequest{
+			ContentType: "json",
+			JsonData:    jsonBody,
+		})
+
+		if strings.Contains(resp.ResponseBody, "You don't have permission to access this.") {
+			fmt.Printf("%d \t OPEN - returned permission error, therefore valid resource\n", port)
+		} else if strings.Contains(resp.ResponseBody, "ECONNREFUSED") {
+			fmt.Printf("%d \t CLOSED\n", port)
+		} else if strings.Contains(resp.ResponseBody, "Request failed with status code 404") {
+			fmt.Printf("%d \t OPENED - returned 404\n", port)
+		} else if strings.Contains(resp.ResponseBody, "Parse Error:") {
+			fmt.Printf("%d \t ???? - returned parse error, potentially open non-http", port)
+		} else if strings.Contains(resp.ResponseBody, "socket hang up") {
+			fmt.Printf("%d \t OPEN - socket hang up, likely non-http", port)
+		} else {
+			fmt.Printf("%d \t %s", port, resp.ResponseBody)
+		}
+	}
+}
+
 func main() {
 	var tr *http.Transport
 
@@ -23,6 +49,7 @@ func main() {
 	target := flag.String("target", "", "target host/ip")
 	timeout := flag.Int("timeout", 3, "timeout")
 	ssrf := flag.String("ssrf", "", "ssrf target")
+	ssrfTargets := flag.String("ssrflist", "", "ssrf target list")
 
 	// parse args
 	flag.Parse()
@@ -46,26 +73,22 @@ func main() {
 		Timeout:   time.Duration(*timeout) * time.Second,
 	}
 
-	for _, port := range ports {
-		jsonBody := []byte(fmt.Sprintf("{\"url\":\"%s:%d\"}", *ssrf, port))
+	if *ssrfTargets == "" {
+		portScan(client, *debug, *target, *ssrf)
+	} else {
+		// Ex 12.4.4.2 - Extra Mile: multi-target SSRF port scanner
+		file, err := os.Open(*ssrfTargets)
+		if err != nil {
+			log.Fatalln("Failed to open wordlist: ", err)
+		}
+		defer file.Close()
 
-		resp := utils.SendPostRequest(client, *debug, *target, utils.PostRequest{
-			ContentType: "json",
-			JsonData:    jsonBody,
-		})
+		fileScanner := bufio.NewScanner(file)
+		fileScanner.Split(bufio.ScanLines)
 
-		if strings.Contains(resp.ResponseBody, "You don't have permission to access this.") {
-			fmt.Printf("%d \t OPEN - returned permission error, therefore valid resource\n", port)
-		} else if strings.Contains(resp.ResponseBody, "ECONNREFUSED") {
-			fmt.Printf("%d \t CLOSED\n", port)
-		} else if strings.Contains(resp.ResponseBody, "Request failed with status code 404") {
-			fmt.Printf("%d \t OPENED - returned 404\n", port)
-		} else if strings.Contains(resp.ResponseBody, "Parse Error:") {
-			fmt.Printf("%d \t ???? - returned parse error, potentially open non-http", port)
-		} else if strings.Contains(resp.ResponseBody, "socket hang up") {
-			fmt.Printf("%d \t OPEN - socket hang up, likely non-http", port)
-		} else {
-			fmt.Printf("%d \t %s", port, resp.ResponseBody)
+		for fileScanner.Scan() {
+			ssrfTarget := strings.TrimSpace(fileScanner.Text())
+			portScan(client, *debug, *target, ssrfTarget)
 		}
 	}
 
