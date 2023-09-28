@@ -1,6 +1,7 @@
 go 1.20
 
 use (
+	./apigateway
 	./atutor/sqli
 	./atutor/tjuggle
 	./bassmaster
