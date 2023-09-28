@@ -5,12 +5,13 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	"github.com/iPhantasmic/OSWE/scripts/utils"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/iPhantasmic/OSWE/scripts/utils"
 )
 
 // Ex 12.4.4.1 - SSRF port scanner
