@@ -1,0 +1,14 @@
+{
+	"connection": {
+		"type": "rdp",
+		"settings": {
+			"hostname": "rdesktop",
+			"username": "abc",
+			"password": "abc",
+			"port": 3389,
+			"security": "any",
+			"ignore-cert": "true"
+		}
+	}
+  }
+  

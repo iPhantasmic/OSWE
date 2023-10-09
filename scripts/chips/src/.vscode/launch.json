@@ -1,0 +1,24 @@
+{
+
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "node",
+			"request": "attach",
+			"name": "Attach to remote",
+			"address": "192.168.203.138",
+			"port": 9229,
+			"localRoot": "${workspaceFolder}",
+			"remoteRoot": "/usr/src/app"
+		},
+		{
+			"type": "node",
+			"request": "attach",
+			"name": "Attach to remote (cli)",
+			"address": "192.168.203.138",
+			"port": 9228,
+			"localRoot": "${workspaceFolder}",
+			"remoteRoot": "/usr/src/app"
+		}
+	]
+}

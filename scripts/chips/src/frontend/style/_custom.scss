@@ -1,0 +1,45 @@
+@import "~bootstrap/scss/bootstrap";
+
+
+body{margin-top:20px;
+	color: #bcd0f7;
+		background: #1A233A;
+	}
+	.account-settings .company-profile {
+		margin: 0 0 1rem 0;
+		padding-bottom: 1rem;
+		text-align: center;
+	}
+	.account-settings .company-profile .company-logo {
+		margin: 0 0 1rem 0;
+	}
+	.account-settings .company-profile .company-logo img {
+		width: 90px;
+		height: 90px;
+	}
+	.account-settings .company-profile h5.company-name {
+		margin: 0 0 0.5rem 0;
+	}
+	.account-settings .about {
+		margin: 1rem 0 0 0;
+		font-size: 0.8rem;
+		text-align: center;
+	}
+	.card {
+		background: #272E48;
+		-webkit-border-radius: 5px;
+		-moz-border-radius: 5px;
+		border-radius: 5px;
+		border: 0;
+		margin-bottom: 1rem;
+	}
+	.form-control {
+		border: 1px solid #596280;
+		-webkit-border-radius: 2px;
+		-moz-border-radius: 2px;
+		border-radius: 2px;
+		font-size: .825rem;
+		background: #1A233A;
+		color: #bcd0f7;
+	}
+	

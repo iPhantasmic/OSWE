@@ -1,0 +1,125 @@
+<%- include('header') -%>
+<div class="container">
+<div class="row gutters">
+	<div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+		<div class="card h-100">
+			<div class="card-body">
+				<div class="account-settings">
+					<div class="company-profile">
+						<div class="company-logo">
+							<img src="/images/logo.png">
+						</div>
+						<h5 class="company-name">Chips</h5>
+					</div>
+					<div class="about">
+						<h5 class="mb-2 text-primary">About</h5>
+						<p>Your dev environment is one step away. Click connect to start the session</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+		<div class="card h-100">
+			<div class="card-body">
+				<div class="row gutters">
+					<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+						<h6 class="mb-3 text-primary"><strong>Container Name:</strong> <%= container.Name %> - <%= container.Status %></h6>
+						<sub class="mb-3"><strong>Image:</strong> <%= container.Image %></sub>
+						<br>
+						<sub class="mb-3"><strong>Build:</strong> <%= container.Labels.build_version %></sub>
+						<br>
+
+					</div>
+				</div>
+				<div class="mt-4">
+					<form>
+						<div class="row gutters">
+							<div class="collapse" id="advancedSettings">
+								<div class="card card-body">
+									<div class="row gutters">
+										<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+											<div class="form-group">
+												<label for="hostname">hostname</label>
+												<input type="name" name="hostname" class="form-control" id="hostname" value='<%= s.connection.settings.hostname %>'>
+											</div>
+										</div>
+										<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+											<div class="form-group">
+												<label for="username">username</label>
+												<input type="name" name="username" class="form-control" id="username" value='<%= s.connection.settings.username %>'>
+											</div>
+										</div>
+										<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+											<div class="form-group">
+												<label for="password">password</label>
+												<input type="password" name="password" class="form-control" id="password" value='<%= s.connection.settings.password %>'>
+											</div>
+										</div>
+										<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+											<div class="form-group">
+												<label for="port">port</label>
+												<input type="name" name="port" class="form-control" id="port" value='<%= s.connection.settings.port %>'>
+											</div>
+										</div>
+										<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+											<div class="form-group">
+												<label for="security">security</label>
+												<input type="name" name="security" class="form-control" id="security" value='<%= s.connection.settings.security %>'>
+											</div>
+										</div>
+										<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+											<div class="form-group">
+												<label for="ignore-cert">ignore-cert</label>
+												<input type="name" name="ignore-cert" class="form-control" id="ignore-cert" value='<%= s.connection.settings["ignore-cert"] %>'>
+											</div>
+										</div>
+										<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+											<div class="form-group">
+												<label for="client-name">client-name</label>
+												<input type="name" name="client-name" class="form-control" id="client-name" placeholder="Enter Client Name">
+											</div>
+										</div>
+										<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+											<div class="form-group">
+												<label for="console">console</label>
+												<select id="console" class="custom-select" aria-label="" name="console">
+													<option selected value="false">false</option>
+													<option value="true">true</option>
+												</select>
+											</div>
+										</div>
+										<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+											<div class="form-group">
+												<label for="initial-program">initial-program</label>
+												<input type="text" class="form-control" id="initial-program" placeholder="" name="initial-program">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row gutters">
+							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+								<div class="text-left">
+									<a class="btn btn-secondary" data-toggle="collapse" href="#advancedSettings" aria-expanded="false" aria-controls="advancedSettings">
+										Advanced Connection Settings
+									</a>
+								</div>
+
+							</div>
+							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+								<div class="text-right">
+									<button type="submit" id="submit" name="submit" class="btn btn-primary">Connect</button>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+<%- include('footer') -%>

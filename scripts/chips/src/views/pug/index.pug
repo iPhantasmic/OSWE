@@ -1,0 +1,84 @@
+extends layout
+
+block content
+  .container
+    .row.gutters
+      .col-xl-3.col-lg-3.col-md-12.col-sm-12.col-12
+        .card.h-100
+          .card-body
+            .account-settings
+              .company-profile
+                .company-logo
+                  img(src='/images/logo.png')
+                h5.company-name Chips
+              .about
+                h5.mb-2.text-primary About
+                p Your dev environment is one step away. Click connect to start the session
+      .col-xl-9.col-lg-9.col-md-12.col-sm-12.col-12
+        .card.h-100
+          .card-body
+            .row.gutters
+              .col-xl-12.col-lg-12.col-md-12.col-sm-12.col-12
+                h6.mb-3.text-primary
+                  strong Container Name:
+                  |  #{ container.Name } - #{ container.Status }
+                sub.mb-3
+                  strong Image:
+                  |  #{ container.Image }
+                br
+                sub.mb-3
+                  strong Build:
+                  |#{ container.Labels.build_version }
+                br
+            .mt-4
+              form
+                .row.gutters
+                  #advancedSettings.collapse
+                    .card.card-body
+                      .row.gutters
+                        .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                          .form-group
+                            label(for='hostname') hostname
+                            input#hostname.form-control(type='name' name='hostname' value=s.connection.settings.hostname)
+                        .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                          .form-group
+                            label(for='username') username
+                            input#username.form-control(type='name' name='username' value=s.connection.settings.username)
+                        .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                          .form-group
+                            label(for='password') password
+                            input#password.form-control(type='password' name='password' value=s.connection.settings.password)
+                        .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                          .form-group
+                            label(for='port') port
+                            input#port.form-control(type='name' name='port' value=s.connection.settings.port)
+                        .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                          .form-group
+                            label(for='security') security
+                            input#security.form-control(type='name' name='security' value=s.connection.settings.security)
+                        .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                          .form-group
+                            label(for='ignore-cert') ignore-cert
+                            input#ignore-cert.form-control(type='name' name='ignore-cert' value=s.connection.settings['ignore-cert'])
+                        .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                          .form-group
+                            label(for='client-name') client-name
+                            input#client-name.form-control(type='name' name='client-name' placeholder='Enter Client Name')
+                        .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                          .form-group
+                            label(for='console') console
+                            select#console.custom-select(aria-label='' name='console')
+                              option(selected='' value='false') false
+                              option(value='true') true
+                        .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                          .form-group
+                            label(for='initial-program') initial-program
+                            input#initial-program.form-control(type='text' placeholder='' name='initial-program')
+                .row.gutters
+                  .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-6
+                    .text-left
+                      a.btn.btn-secondary(data-toggle='collapse' href='#advancedSettings' aria-expanded='false' aria-controls='advancedSettings')
+                        | Advanced Connection Settings
+                  .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-6
+                    .text-right
+                      button#submit.btn.btn-primary(type='submit' name='submit') Connect

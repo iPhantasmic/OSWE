@@ -1,0 +1,6 @@
+{
+	"crypt": {
+		"cypher": "AES-256-CBC",
+		"key": "MySuperSecretKeyForParamsToken12"
+	}
+}
