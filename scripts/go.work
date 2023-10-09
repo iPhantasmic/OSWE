@@ -5,6 +5,7 @@ use (
 	./atutor/sqli
 	./atutor/tjuggle
 	./bassmaster
+	./chips
 	./concord/part1
 	./erpnext
 	./manageengine
