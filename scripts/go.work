@@ -8,6 +8,8 @@ use (
 	./chips
 	./concord/part1
 	./erpnext
+	./exam/t1
+	./exam/t2
 	./manageengine
 	./opencrx
 	./openitcockpit
