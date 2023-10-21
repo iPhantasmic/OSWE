@@ -194,7 +194,14 @@ func SendPostRequest(client *http.Client, debug bool, requestURL string, postReq
 		}
 	}
 
-	if postRequest.ContentType != "multipart" && postRequest.ContentType != "form" && postRequest.ContentType != "json" && postRequest.ContentType != "xml" {
+	if postRequest.ContentType == "none" {
+		req, err = http.NewRequest(http.MethodPost, requestURL, nil)
+		if err != nil {
+			log.Fatalln("[-] Failed to create HTTP request: ", err)
+		}
+	}
+
+	if postRequest.ContentType != "none" && postRequest.ContentType != "multipart" && postRequest.ContentType != "form" && postRequest.ContentType != "json" && postRequest.ContentType != "xml" {
 		log.Fatalln("[-] Failed to create HTTP request: Invalid POST request mode - " + postRequest.ContentType)
 	}
 
